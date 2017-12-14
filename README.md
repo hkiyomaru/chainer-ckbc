@@ -2,7 +2,7 @@
 
 Chainer-based implementation of Commonsense Knowledge Base Completion.
 
-See "Commonsense Knowledge Base Completion", Xiang Li; Aynaz Taheri; Lifu Tu; Kevin Gimpel, ACL 2016.
+See "[Commonsense Knowledge Base Completion](http://aclweb.org/anthology/P/P16/P16-1137.pdf)", Xiang Li; Aynaz Taheri; Lifu Tu; Kevin Gimpel, ACL 2016.
 
 # Development Environment
 
