@@ -14,3 +14,7 @@ See "[Commonsense Knowledge Base Completion](http://aclweb.org/anthology/P/P16/P
 * nltk
 * progressbar
 * and their dependencies
+
+# Dataset
+
+Dataset is derived from [the original implementation](https://github.com/Lorraine333/ACL_CKBC).
