@@ -7,13 +7,16 @@ import progressbar
 from utils import count_lines
 
 
-def make_vocab(path, n_vocab, delimiter=' '):
+def make_vocab(path, n_vocab, delimiter=' ', lower=True):
     n_lines = count_lines(args.TRAIN)
     bar = progressbar.ProgressBar()
     words = []
     with open(args.TRAIN) as f:
         for line in bar(f, max_value=n_lines):
             _, h, t, _ = line.strip().split('\t')
+            if lower is True:
+                h = str(h).lower()
+                t = str(t).lower()
             words.extend(h.strip().split(delimiter))
             words.extend(t.strip().split(delimiter))
     counter = collections.Counter(words)
