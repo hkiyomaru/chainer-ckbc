@@ -12,6 +12,7 @@ from utils import load_vocabulary
 from utils import load_data
 from utils import calculate_unknown_ratio
 from utils import fact_pad_concat_convert
+from utils import load_embedding
 from metrics import CalculateAccuracy
 
 
@@ -38,6 +39,10 @@ def main():
                         help='number of layers')
     parser.add_argument('--log-interval', type=int, default=200,
                         help='number of iteration to show log')
+    parser.add_argument('--embedding', default='',
+                        help='path to pretrained word embedding')
+    parser.add_argument('--finetune-embedding', action='store_true',
+                        help='finetune pretrained embedding')
     parser.add_argument('--validation-interval', type=int, default=4000,
                         help='number of iteration to evlauate the model '
                         'with validation dataset')
@@ -67,19 +72,28 @@ def main():
         [t for _, _, t, _ in train_data]
     )
 
+    embedding = load_embedding(args.embedding, concept_ids) \
+        if args.embedding else None
+    n_embed = embedding.shape[1] \
+        if embedding is not None else args.concept_unit
+
     print('Concept vocabulary size: %d' % len(concept_ids))
     print('Relation vocabulary size: %d' % len(relation_ids))
     print('Train data size: %d' % len(train_data))
     print('Train head unknown: %.2f' % train_head_unk)
     print('Train relation unknown: %.2f' % train_relation_unk)
     print('Train tail unknown: %.2f' % train_tail_unk)
+    print('Pretrained word embedding: %s' % args.embedding)
+    if args.embedding:
+        print('Fine-tune word embedding: %s' % args.finetune_embedding)
 
     model = BilinearCKBC(
         len(concept_ids),
         len(relation_ids),
-        args.concept_unit,
+        n_embed,
         args.relation_unit,
-        args.dropout
+        args.dropout,
+        embedding=embedding
     )
     if args.gpu >= 0:
         chainer.cuda.get_device(args.gpu).use()
@@ -87,6 +101,9 @@ def main():
 
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(model)
+    if args.embedding is not None and not args.finetune_embedding:
+        print('Freezing word embeddings...')
+        model.concept_encoder.disable_update()
 
     train_iter = chainer.iterators.SerialIterator(train_data, args.batchsize)
     updater = training.StandardUpdater(

@@ -6,6 +6,8 @@ import numpy
 from chainer import cuda
 from chainer.dataset import convert
 
+from gensim.models import KeyedVectors
+
 
 # speical symbols
 PAD = -1
@@ -109,3 +111,20 @@ def calculate_unknown_ratio(data):
     unknown = sum((s == UNK).sum() for s in data)
     total = sum(s.size for s in data)
     return unknown / total
+
+
+def load_embedding(path, vocab):
+    model = KeyedVectors.load_word2vec_format(path, binary=True)
+    embedding = numpy.zeros((len(vocab), model.vector_size), 'f')
+    unk_indexes = []
+    for k, v in vocab.items():
+        if k in model.vocab:
+            embedding[v] = model.word_vec(k)
+        else:
+            unk_indexes.append(v)
+    unk_vector = numpy.sum(embedding, axis=0) / (len(vocab) - len(unk_indexes))
+    embedding[unk_indexes] = unk_vector
+
+    unk_ratio = len(unk_indexes) / len(vocab)
+    print('Pretrained word embedding covers %.2f%% of vocabulary' % unk_ratio)
+    return embedding

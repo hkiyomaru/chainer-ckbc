@@ -9,13 +9,14 @@ from utils import PAD
 class BilinearCKBC(chainer.Chain):
 
     def __init__(self, n_concept_vocab, n_relation_vocab, n_concept_units,
-                 n_relation_units, n_dropout):
+                 n_relation_units, n_dropout, embedding=None):
 
         super(BilinearCKBC, self).__init__()
         with self.init_scope():
             self.concept_encoder = L.EmbedID(
                 n_concept_vocab,
-                n_concept_units
+                n_concept_units,
+                initialW=embedding
             )
             self.relation_encoder = L.EmbedID(
                 n_relation_vocab,
