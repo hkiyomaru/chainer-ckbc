@@ -105,3 +105,6 @@ venv.bak/
 
 # data directory
 data/
+
+# result directory
+result/
