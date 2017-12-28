@@ -114,10 +114,12 @@ def calculate_unknown_ratio(data):
 
 
 def load_embedding(path, vocab):
+    print('loading...: %s' % path)
     model = KeyedVectors.load_word2vec_format(path, binary=True)
     embedding = numpy.zeros((len(vocab), model.vector_size), 'f')
     unk_indexes = []
-    for k, v in vocab.items():
+    bar = progressbar.ProgressBar()
+    for k, v in bar(vocab.items(), max_value=len(vocab)):
         if k in model.vocab:
             embedding[v] = model.word_vec(k)
         else:

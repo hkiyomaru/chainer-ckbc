@@ -21,8 +21,10 @@ def main():
     parser.add_argument('TRAIN', help='training dataset')
     parser.add_argument('CONCEPT_VOCAB', help='concept vocabulary')
     parser.add_argument('RELATION_VOCAB', help='relation vocabulary')
-    parser.add_argument('--validation',
-                        help='validation dataset')
+    parser.add_argument('--validation1',
+                        help='validation dataset (1)')
+    parser.add_argument('--validation2',
+                        help='validation dataset (2)')
     parser.add_argument('--test',
                         help='test dataset')
     parser.add_argument('--batchsize', '-b', type=int, default=128,
@@ -83,8 +85,8 @@ def main():
     print('Train head unknown: %.2f' % train_head_unk)
     print('Train relation unknown: %.2f' % train_relation_unk)
     print('Train tail unknown: %.2f' % train_tail_unk)
-    print('Pretrained word embedding: %s' % args.embedding)
     if args.embedding:
+        print('Pretrained word embedding: %s' % args.embedding)
         print('Fine-tune word embedding: %s' % args.finetune_embedding)
 
     model = BilinearCKBC(
@@ -117,37 +119,60 @@ def main():
     trainer.extend(
         extensions.PrintReport(
             ['epoch', 'iteration', 'main/loss', 'validation/main/loss',
-             'validation/main/acc', 'elapsed_time']
+             'validation/main/accuracy', 'validation/main/threshold',
+             'elapsed_time']
         ),
         trigger=(args.log_interval, 'iteration')
     )
 
-    if args.validation:
+    if args.validation1 and args.validation2:
         test_facts = load_data(
             concept_ids,
             relation_ids,
-            args.validation
+            args.validation1
         )
-        test_data = [(h, r, t, y) for h, r, t, y in six.moves.zip(*test_facts)]
+        test_data1 = [(h, r, t, y)
+                      for h, r, t, y in six.moves.zip(*test_facts)]
         test_head_unk = calculate_unknown_ratio(
-            [h for h, _, _, _ in test_data]
+            [h for h, _, _, _ in test_data1]
         )
         test_relation_unk = calculate_unknown_ratio(
-            [r for _, r, _, _ in test_data]
+            [r for _, r, _, _ in test_data1]
         )
         test_tail_unk = calculate_unknown_ratio(
-            [t for _, _, t, _ in test_data]
+            [t for _, _, t, _ in test_data1]
         )
+        print('Validation data: %d' % len(test_data1))
+        print('Validation head unknown: %.2f' % test_head_unk)
+        print('Validation relation unknown: %.2f' % test_relation_unk)
+        print('Validation tail unknown: %.2f' % test_tail_unk)
 
-        print('Validation data: %d' % len(test_data))
+        test_facts = load_data(
+            concept_ids,
+            relation_ids,
+            args.validation2
+        )
+        test_data2 = [(h, r, t, y)
+                      for h, r, t, y in six.moves.zip(*test_facts)]
+        test_head_unk = calculate_unknown_ratio(
+            [h for h, _, _, _ in test_data2]
+        )
+        test_relation_unk = calculate_unknown_ratio(
+            [r for _, r, _, _ in test_data2]
+        )
+        test_tail_unk = calculate_unknown_ratio(
+            [t for _, _, t, _ in test_data2]
+        )
+        print('Validation data: %d' % len(test_data2))
         print('Validation head unknown: %.2f' % test_head_unk)
         print('Validation relation unknown: %.2f' % test_relation_unk)
         print('Validation tail unknown: %.2f' % test_tail_unk)
 
         trainer.extend(
             CalculateAccuracy(
-                model, test_data, device=args.gpu,
-                key='validation/main/acc'
+                model, test_data1, test_data2, device=args.gpu,
+                key_accuracy='validation/main/accuracy',
+                key_threshold='validation/main/threshold'
             ),
             trigger=(args.validation_interval, 'iteration')
         )
