@@ -38,7 +38,7 @@ $ python preprocess.py <path/to/training-data> --n-vocab <number of vocabulary>
 Then, let's start training.
 
 ```
-$ python train.py <path/to/training-data> <path/to/concept-vocabulary> <path/to/relation-vocabulary> --validation <path/to/validation-data> --embedding <path/to/pretrained-word-embedding> -g <gpu-id>
+$ python train.py <path/to/training-data> <path/to/concept-vocabulary> <path/to/relation-vocabulary> --validation1 <path/to/validation-data1> --validation2 <path/to/validation-data2> --embedding <path/to/pretrained-word-embedding> -g <gpu-id>
 ```
 
 See command line help for other options.
