@@ -43,6 +43,10 @@ def main():
                         help='number of iteration to show log')
     parser.add_argument('--embedding', default='',
                         help='path to pretrained word embedding')
+    parser.add_argument('--encoding', default='average',
+                        choices=['average', 'bilstm-max-pooling',
+                                 'bilstm-last-state'],
+                        help='encoding encodings')
     parser.add_argument('--finetune-embedding', action='store_true',
                         help='finetune pretrained embedding')
     parser.add_argument('--validation-interval', type=int, default=4000,
@@ -85,6 +89,7 @@ def main():
     print('Train head unknown: %.2f' % train_head_unk)
     print('Train relation unknown: %.2f' % train_relation_unk)
     print('Train tail unknown: %.2f' % train_tail_unk)
+    print('Encoding encoding: %s' % args.encoding)
     if args.embedding:
         print('Pretrained word embedding: %s' % args.embedding)
         print('Fine-tune word embedding: %s' % args.finetune_embedding)
@@ -95,6 +100,7 @@ def main():
         n_embed,
         args.relation_unit,
         args.dropout,
+        encoding=args.encoding,
         embedding=embedding
     )
     if args.gpu >= 0:
@@ -178,8 +184,4 @@ def main():
         )
 
     print('start training')
-    trainer.run()
-
-
-if __name__ == '__main__':
-    main()
+    t
