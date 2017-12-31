@@ -105,7 +105,7 @@ def main():
     optimizer.setup(model)
     if args.embedding is not None and not args.finetune_embedding:
         print('Freezing word embeddings...')
-        model.concept_encoder.disable_update()
+        model.concept_encoder.concept_encoder.disable_update()
 
     train_iter = chainer.iterators.SerialIterator(train_data, args.batchsize)
     updater = training.StandardUpdater(
