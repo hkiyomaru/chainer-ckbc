@@ -117,6 +117,7 @@ def load_embedding(path, vocab):
     print('loading...: %s' % path)
     model = KeyedVectors.load_word2vec_format(path, binary=True)
     embedding = numpy.zeros((len(vocab), model.vector_size), 'f')
+
     unk_indexes = []
     bar = progressbar.ProgressBar()
     for k, v in bar(vocab.items(), max_value=len(vocab)):
@@ -127,6 +128,6 @@ def load_embedding(path, vocab):
     unk_vector = numpy.sum(embedding, axis=0) / (len(vocab) - len(unk_indexes))
     embedding[unk_indexes] = unk_vector
 
-    unk_ratio = len(unk_indexes) / len(vocab)
-    print('Pretrained word embedding covers %.2f%% of vocabulary' % unk_ratio)
+    unk_ratio = len(unk_indexes) / len(vocab) * 100.0
+    print('Word embedding covers %.2f%% of vocabulary' % (100.0 - unk_ratio))
     return embedding
