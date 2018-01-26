@@ -8,9 +8,9 @@ from utils import count_lines
 
 
 def make_vocab(path, n_vocab, delimiter=' ', lower=True):
+    words = []
     n_lines = count_lines(args.TRAIN)
     bar = progressbar.ProgressBar()
-    words = []
     with open(args.TRAIN) as f:
         for line in bar(f, max_value=n_lines):
             _, h, t, _ = line.strip().split('\t')
