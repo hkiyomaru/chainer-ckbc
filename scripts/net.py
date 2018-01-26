@@ -6,12 +6,12 @@ import chainer.links as L
 from utils import PAD
 
 
-class BilinearCKBC(chainer.Chain):
+class BilinearAverageModel(chainer.Chain):
 
     def __init__(self, n_concept_vocab, n_relation_vocab, n_concept_units,
                  n_relation_units, n_dropout, embedding=None):
 
-        super(BilinearCKBC, self).__init__()
+        super(BilinearAverageModel, self).__init__()
         with self.init_scope():
             self.concept_encoder = L.EmbedID(
                 n_concept_vocab,
@@ -26,7 +26,6 @@ class BilinearCKBC(chainer.Chain):
                 n_concept_units,
                 n_relation_units
             )
-
         self.n_relation_units = n_relation_units
         self.n_dropout = n_dropout
 
@@ -74,7 +73,14 @@ class BilinearCKBC(chainer.Chain):
 
         # calculate bilinear outputs
         outputs = F.flatten(
-            F.batch_matmul(F.batch_matmul(l_hhs, hrs, transa=True), l_hts)
+            F.batch_matmul(
+                F.batch_matmul(
+                    l_hhs,
+                    hrs,
+                    transa=True
+                ),
+                l_hts
+            )
         )
 
         loss = F.sigmoid_cross_entropy(outputs, ys)

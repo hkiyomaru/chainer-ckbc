@@ -7,7 +7,7 @@ import chainer
 from chainer import training
 from chainer.training import extensions
 
-from net import BilinearCKBC
+from net import BilinearAverageModel
 from utils import load_vocabulary
 from utils import load_data
 from utils import calculate_unknown_ratio
@@ -89,7 +89,7 @@ def main():
         print('Pretrained word embedding: %s' % args.embedding)
         print('Fine-tune word embedding: %s' % args.finetune_embedding)
 
-    model = BilinearCKBC(
+    model = BilinearAverageModel(
         len(concept_ids),
         len(relation_ids),
         n_embed,
@@ -103,13 +103,15 @@ def main():
 
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(model)
-    if args.embedding is not None and not args.finetune_embedding:
+    if args.embedding != '' and not args.finetune_embedding:
         print('Freezing word embeddings...')
         model.concept_encoder.disable_update()
 
     train_iter = chainer.iterators.SerialIterator(train_data, args.batchsize)
     updater = training.StandardUpdater(
-        train_iter, optimizer, converter=fact_pad_concat_convert,
+        train_iter,
+        optimizer,
+        converter=fact_pad_concat_convert,
         device=args.gpu
     )
     trainer = training.Trainer(updater, (args.epoch, 'epoch'))
