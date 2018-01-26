@@ -7,7 +7,7 @@ import chainer
 from chainer import training
 from chainer.training import extensions
 
-from net import BilinearAverageModel
+from net import BilinearAVG
 from utils import load_vocabulary
 from utils import load_data
 from utils import calculate_unknown_ratio
@@ -89,7 +89,7 @@ def main():
         print('Pretrained word embedding: %s' % args.embedding)
         print('Fine-tune word embedding: %s' % args.finetune_embedding)
 
-    model = BilinearAverageModel(
+    model = BilinearAVG(
         len(concept_ids),
         len(relation_ids),
         n_embed,
