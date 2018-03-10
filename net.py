@@ -16,11 +16,13 @@ class BilinearAVG(chainer.Chain):
             self.concept_encoder = L.EmbedID(
                 n_concept_vocab,
                 n_concept_units,
-                initialW=embedding
+                initialW=embedding,
+                ignore_label=PAD
             )
             self.relation_encoder = L.EmbedID(
                 n_relation_vocab,
-                n_relation_units ** 2
+                n_relation_units ** 2,
+                ignore_label=PAD
             )
             self.l_concept = L.Linear(
                 n_concept_units,
